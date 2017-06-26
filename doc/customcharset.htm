@@ -1,0 +1,88 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta name="GENERATOR" content="Microsoft FrontPage 4.0">
+<meta name="ProgId" content="FrontPage.Editor.Document">
+<title>Custom charset in RainbowCrack</title>
+</head>
+
+<body>
+
+<h1>Custom charset in RainbowCrack</h1>
+<p><font size="2">by Zhu Shuanglei &lt;shuanglei@hotmail.com&gt;<br>
+<a href="http://www.antsight.com/zsl/rainbowcrack/">http://www.antsight.com/zsl/rainbowcrack/</a></font></p>
+<hr size="1">
+
+<h2>1. Introduction</h2>
+
+<p>Begin with version 1.1, custom charset is supported in RainbowCrack. In this
+article, we will describe how to generate and use your rainbow tables with customized
+charset.</p>
+
+<h2>2. Prepare your charset configuration file</h2>
+
+<p>In binary distribution of RainbowCrack, there is a file with the name
+&quot;charset.txt&quot;. This is the charset configuration file of RainbowCrack.<br>
+Content of the file looks like this:</p>
+<table border="0" width="100%" bgcolor="#EBEBEB">
+  <tr>
+    <td width="100%"><font face="Courier New">alpha                  = [ABCDEFGHIJKLMNOPQRSTUVWXYZ]<br>
+      alpha-numeric          = [ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789]<br>
+      alpha-numeric-symbol14 = [ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&amp;*()-_+=]<br>
+      all                    = [ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&amp;*()-_+=~`[]{}|\:;"'&lt;>,.?/]</font></td>
+  </tr>
+</table>
+
+<p>Each line contains a charset definition. To the left of character
+&quot;=&quot; is the charset name while the charset content in the right.
+Charset content is quoted by &quot;[&quot; and &quot;]&quot; in case space may
+appear in the charset content.<br>
+For example, we want a charset definition of alpha and space. Just add a line to
+the configuration file:</p>
+<table border="0" width="100%" bgcolor="#EBEBEB">
+  <tr>
+    <td width="100%"><font face="Courier New">alpha-space                  =
+      [ABCDEFGHIJKLMNOPQRSTUVWXYZ ]</font></td>
+  </tr>
+</table>
+<p>Note: Don't use charset other than alpha, number and &quot;-&quot; in charset
+name. Because we store the charset name in the filename of generated rainbow
+table, this convention properly avoid the &quot;invalid filename&quot;
+situation.</p>
+<p>File &quot;charset.txt&quot; in binary distribution is ready to
+work. In most situations you needn't modify it, unless you need a custom
+charset.</p>
+<p>Earlier versions of RainbowCrack (version 1.0 and 1.01) support charset
+&quot;alpha&quot; and &quot;alpha-numeric&quot; only. They don't use a charset
+configuration file. Charset definitions are hard coded in the programs.</p>
+<h2>3. Use charset configuration file</h2>
+
+<p>Configuration file &quot;charset.txt&quot; is used by rtgen.exe and
+rcrack.exe.</p>
+<p>You can specify the required charset name in the command parameter of
+rtgen.exe. For example(in RainbowCrack 1.2):</p>
+<table border="0" width="100%" bgcolor="#EBEBEB">
+  <tr>
+    <td width="100%">rtgen lm alpha-space 1 7 0 100 16 test</td>
+  </tr>
+</table>
+<p>This will generate a rainbow table named &quot;lm_alpha-space#1-7_0_100x16_test.rt&quot;
+with charset &quot;<font face="Courier New">ABCDEFGHIJKLMNOPQRSTUVWXYZ </font>&quot;,
+which is specified in charset.txt.</p>
+<p>Program rcrack.exe will parse the file title for the charset name, search the
+charset content in the configuration file and use the corresponding charset to
+decode the rainbow table.</p>
+<p>Note: When a rainbow table of a certain charset name is generated, don't
+modify the corresponding entry in configuration file. Without the help of
+charset definition in configuration file, the generated rainbow table will
+become garbage.</p>
+<p>Create date: 2003/9/18<br>
+Revised: <!--webbot bot="Timestamp" startspan S-Type="EDITED"
+S-Format="%Y/%m/%d" -->2003/11/21<!--webbot bot="Timestamp" i-CheckSum="12366"
+endspan -->
+</p>
+
+</body>
+
+</html>

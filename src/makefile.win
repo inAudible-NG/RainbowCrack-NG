@@ -1,0 +1,28 @@
+
+CFLAGS = /nologo /MT /W3 /GX /O2
+LDFLAGS = kernel32.lib gdi32.lib libeay32.lib /nologo /subsystem:console /machine:I386
+
+all: rtgen rtdump rtsort rcrack
+
+rtgen:
+	cl $(CFLAGS) Public.cpp ChainWalkContext.cpp HashAlgorithm.cpp HashRoutine.cpp RainbowTableGenerate.cpp	\
+	/link $(LDFLAGS) /out:rtgen.exe
+
+rtdump:
+	cl $(CFLAGS) Public.cpp ChainWalkContext.cpp HashAlgorithm.cpp HashRoutine.cpp RainbowTableDump.cpp	\
+	/link $(LDFLAGS) /out:rtdump.exe
+
+rtsort:
+	cl $(CFLAGS) Public.cpp RainbowTableSort.cpp	\
+	/link $(LDFLAGS) /out:rtsort.exe
+
+rcrack:
+	cl $(CFLAGS) Public.cpp ChainWalkContext.cpp HashAlgorithm.cpp HashRoutine.cpp HashSet.cpp MemoryPool.cpp ChainWalkSet.cpp CrackEngine.cpp RainbowCrack.cpp	\
+	/link $(LDFLAGS) /out:rcrack.exe
+
+clean:
+	del *.obj
+	del rtgen.exe
+	del rtdump.exe
+	del rtsort.exe
+	del rcrack.exe

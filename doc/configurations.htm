@@ -1,0 +1,370 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<meta name="GENERATOR" content="Microsoft FrontPage 4.0">
+<meta name="ProgId" content="FrontPage.Editor.Document">
+<title>Large charset configurations for RainbowCrack</title>
+</head>
+
+<body>
+
+<h1>Large charset configurations for RainbowCrack</h1>
+<font size="2">by Zhu Shuanglei &lt;shuanglei@hotmail.com&gt;<br>
+<a href="http://www.antsight.com/zsl/rainbowcrack/">http://www.antsight.com/zsl/rainbowcrack/</a><br>
+</font>
+
+<hr size="1">
+
+
+
+
+<h2>1. Introduction</h2>
+<p>In this article, we will introduce some large charset configurations for RainbowCrack.
+All these configurations need long precomputation time.&nbsp;<br>
+ If you haven't read the tutorial of RainbowCrack, read
+it first before you read this.<br>
+</p>
+<h2>2. Explanation of success rate</h2>
+<p>In the tutorial, there is a configuration for charset
+&quot;alpha-numeric&quot;(configuration #2). We precompute five rainbow tables
+and reach the success rate 99.04%, which&nbsp; means if there are 1000
+alpha-numeric passwords to crack, you can crack about 990 of them with the help
+of these five tables. Perhaps you want to go further.<br>
+In fact, each rainbow table has its own success rate. In configuration #2, the
+success rate of each table is 60.55%.(see Appendix A for more infomation).
+However, success rate of each table is independent and if you have two such
+rainbow tables, the success rate will reach:<br>
+1 - (1 - 0.6055) ^ 2 = 0.8444<br>
+If you have five such tables, the success rate is now:<br>
+1 - (1 - 0.6055) ^ 5 = 0.9904</p>
+<p>Now you know how to reach better success rate:&nbsp;<br>
+1 - (1 - 0.6055) ^ 6 = 0.9962<br>
+1 - (1 - 0.6055) ^ 7 = 0.9985<br>
+1 - (1 - 0.6055) ^ 8 = 0.9994<br>
+1 - (1 - 0.6055) ^ 9 = 0.9998<br>
+....</p>
+<p>Just generate additional rainbow tables to reach any success rate you want:<br>
+rtgen lm alpha-numeric 1 7 5 2400 40000000 all<br>
+rtgen lm alpha-numeric 1 7 6 2400 40000000 all<br>
+rtgen lm alpha-numeric 1 7 7 2400 40000000 all<br>
+rtgen lm alpha-numeric 1 7 8 2400 40000000 all<br>
+....</p>
+<p>This is another trade-off: higher success rate at the cost of additional
+precomputation time and larger disk space.<br>
+</p>
+<h2>3. Configuration #3 for charset &quot;alpha-numeric-symbol14&quot;</h2>
+<table border="1" cellspacing="0" bordercolor="#C0C0C0" width="927">
+  <tr>
+    <td colSpan="2" width="921">configuration #3</td>
+  </tr>
+  <tr>
+    <td width="224">hash algorithm</td>
+    <td width="693">lm</td>
+  </tr>
+  <tr>
+    <td width="224">charset</td>
+    <td width="693">alpha-numeric-symbol14(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&amp;*()-_+=)<br>
+      (or any charset with same length)</td>
+  </tr>
+  <tr>
+    <td width="224">plaintext length range</td>
+    <td width="693">1 - 7</td>
+  </tr>
+  <tr>
+    <td width="224">key space</td>
+    <td width="693">50^1 + 50^2 + 50^3 + 50^4 + 50^5 + 50^6 + 50^7 = 797193877550</td>
+  </tr>
+  <tr>
+    <td width="224">t</td>
+    <td width="693">5700</td>
+  </tr>
+  <tr>
+    <td width="224">m</td>
+    <td width="693">200000000</td>
+  </tr>
+  <tr>
+    <td width="224">l</td>
+    <td width="693">6</td>
+  </tr>
+  <tr>
+    <td width="224">disk usage</td>
+    <td width="693">m * 16 * l = 19200000000 B = 18.3 GB</td>
+  </tr>
+  <tr>
+    <td width="224">success rate</td>
+    <td width="693">1 - (1 - 0.6864) ^ 6 = 0.9990</td>
+  </tr>
+  <tr>
+    <td width="224">mean cryptanalysis time</td>
+    <td width="693">66.7878 s</td>
+  </tr>
+  <tr>
+    <td width="224">max cryptanalysis time</td>
+    <td width="693">  275.3390 s</td>
+  </tr>
+  <tr>
+    <td width="224">max disk access time</td>
+    <td width="693">  570.3285 s</td>
+  </tr>
+  <tr>
+    <td vAlign="top" width="224">table precomputation commands</td>
+    <td width="693">rtgen lm alpha-numeric-symbol14 1 7 0 5700 40000000 #0<br>
+      rtgen lm alpha-numeric-symbol14 1 7 0 5700 40000000 #1<br>
+      rtgen lm alpha-numeric-symbol14 1 7 0 5700 40000000 #2<br>
+      rtgen lm alpha-numeric-symbol14 1 7 0 5700 40000000 #3<br>
+      rtgen lm alpha-numeric-symbol14 1 7 0 5700 40000000 #4<br>
+      <br>
+      rtgen lm alpha-numeric-symbol14 1 7 1 5700 40000000 #0<br>
+      rtgen lm alpha-numeric-symbol14 1 7 1 5700 40000000 #1<br>
+      rtgen lm alpha-numeric-symbol14 1 7 1 5700 40000000 #2<br>
+      rtgen lm alpha-numeric-symbol14 1 7 1 5700 40000000 #3<br>
+      rtgen lm alpha-numeric-symbol14 1 7 1 5700 40000000 #4<br>
+      <br>
+      rtgen lm alpha-numeric-symbol14 1 7 2 5700 40000000 #0<br>
+      rtgen lm alpha-numeric-symbol14 1 7 2 5700 40000000 #1<br>
+      rtgen lm alpha-numeric-symbol14 1 7 2 5700 40000000 #2<br>
+      rtgen lm alpha-numeric-symbol14 1 7 2 5700 40000000 #3<br>
+      rtgen lm alpha-numeric-symbol14 1 7 2 5700 40000000 #4<br>
+      <br>
+      rtgen lm alpha-numeric-symbol14 1 7 3 5700 40000000 #0<br>
+      rtgen lm alpha-numeric-symbol14 1 7 3 5700 40000000 #1<br>
+      rtgen lm alpha-numeric-symbol14 1 7 3 5700 40000000 #2<br>
+      rtgen lm alpha-numeric-symbol14 1 7 3 5700 40000000 #3<br>
+      rtgen lm alpha-numeric-symbol14 1 7 3 5700 40000000 #4<br>
+      <br>
+      rtgen lm alpha-numeric-symbol14 1 7 4 5700 40000000 #0<br>
+      rtgen lm alpha-numeric-symbol14 1 7 4 5700 40000000 #1<br>
+      rtgen lm alpha-numeric-symbol14 1 7 4 5700 40000000 #2<br>
+      rtgen lm alpha-numeric-symbol14 1 7 4 5700 40000000 #3<br>
+      rtgen lm alpha-numeric-symbol14 1 7 4 5700 40000000 #4<br>
+      <br>
+      rtgen lm alpha-numeric-symbol14 1 7 5 5700 40000000 #0<br>
+      rtgen lm alpha-numeric-symbol14 1 7 5 5700 40000000 #1<br>
+      rtgen lm alpha-numeric-symbol14 1 7 5 5700 40000000 #2<br>
+      rtgen lm alpha-numeric-symbol14 1 7 5 5700 40000000 #3<br>
+      rtgen lm alpha-numeric-symbol14 1 7 5 5700 40000000 #4</td>
+  </tr>
+  <tr>
+    <td vAlign="top" width="224">table precomputation time</td>
+    <td width="693">5700 * 200000000 * 6 / 354000 / 3600 / 24 = 224 days<br>
+      7.5 days for each file, 30 files total</td>
+  </tr>
+</table>
+<h2>
+4. Configuration #4 for charset &quot;all&quot;</h2>
+<table border="1" cellspacing="0" bordercolor="#C0C0C0" width="927">
+  <tr>
+    <td colSpan="2" width="921">configuration #4</td>
+  </tr>
+  <tr>
+    <td width="224">hash algorithm</td>
+    <td width="693">lm</td>
+  </tr>
+  <tr>
+    <td width="224">charset</td>
+    <td width="693">all(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&amp;*()-_+=~`[]{}|\:;"'&lt;&gt;,.?/)<br>
+      (or any charset with same length)</td>
+  </tr>
+  <tr>
+    <td width="224">plaintext length range</td>
+    <td width="693">1 - 7</td>
+  </tr>
+  <tr>
+    <td width="224">key space</td>
+    <td width="693">68^1 + 68^2 + 68^3 + 68^4 + 68^5 + 68^6 + 68^7 = 6823331935124</td>
+  </tr>
+  <tr>
+    <td width="224">t</td>
+    <td width="693">9000</td>
+  </tr>
+  <tr>
+    <td width="224">m</td>
+    <td width="693">1000000000</td>
+  </tr>
+  <tr>
+    <td width="224">l</td>
+    <td width="693">8</td>
+  </tr>
+  <tr>
+    <td width="224">disk usage</td>
+    <td width="693">m * 16 * l = 128000000000 B = 119 GB</td>
+  </tr>
+  <tr>
+    <td width="224">success rate</td>
+    <td width="693">1 - (1 - calc_success_probability(6823331935124, 9000, 8000000000/8)) ^ 8 = 0.9990</td>
+  </tr>
+  <tr>
+    <td width="224">mean cryptanalysis time</td>
+    <td width="693">197.0106 s</td>
+  </tr>
+  <tr>
+    <td width="224">max cryptanalysis time</td>
+    <td width="693">  915.2542 s</td>
+  </tr>
+  <tr>
+    <td width="224">max disk access time</td>
+    <td width="693">  3802.2 s</td>
+  </tr>
+  <tr>
+    <td vAlign="top" width="224">table precomputation commands</td>
+    <td width="693">rtgen lm all 1 7 0 9000 40000000 #00<br>
+      rtgen lm all 1 7 0 9000 40000000 #01<br>
+      rtgen lm all 1 7 0 9000 40000000 #02<br>
+      ...<br>
+      rtgen lm all 1 7 0 9000 40000000 #23<br>
+      rtgen lm all 1 7 0 9000 40000000 #24<br>
+      <br>
+      rtgen lm all 1 7 1 9000 40000000 #00<br>
+      rtgen lm all 1 7 1 9000 40000000 #01<br>
+      rtgen lm all 1 7 1 9000 40000000 #02<br>
+      ...<br>
+      rtgen lm all 1 7 1 9000 40000000 #23<br>
+      rtgen lm all 1 7 1 9000 40000000 #24<br>
+      <br>
+      rtgen lm all 1 7 2 9000 40000000 #00<br>
+      rtgen lm all 1 7 2 9000 40000000 #01<br>
+      rtgen lm all 1 7 2 9000 40000000 #02<br>
+      ...<br>
+      rtgen lm all 1 7 2 9000 40000000 #23<br>
+      rtgen lm all 1 7 2 9000 40000000 #24<br>
+      <br>
+      rtgen lm all 1 7 3 9000 40000000 #00<br>
+      rtgen lm all 1 7 3 9000 40000000 #01<br>
+      rtgen lm all 1 7 3 9000 40000000 #02<br>
+      ...<br>
+      rtgen lm all 1 7 3 9000 40000000 #23<br>
+      rtgen lm all 1 7 3 9000 40000000 #24<br>
+      <br>
+      rtgen lm all 1 7 4 9000 40000000 #00<br>
+      rtgen lm all 1 7 4 9000 40000000 #01<br>
+      rtgen lm all 1 7 4 9000 40000000 #02<br>
+      ...<br>
+      rtgen lm all 1 7 4 9000 40000000 #23<br>
+      rtgen lm all 1 7 4 9000 40000000 #24<br>
+      <br>
+      rtgen lm all 1 7 5 9000 40000000 #00<br>
+      rtgen lm all 1 7 5 9000 40000000 #01<br>
+      rtgen lm all 1 7 5 9000 40000000 #02<br>
+      ...<br>
+      rtgen lm all 1 7 5 9000 40000000 #23<br>
+      rtgen lm all 1 7 5 9000 40000000 #24<br>
+      <br>
+      rtgen lm all 1 7 6 9000 40000000 #00<br>
+      rtgen lm all 1 7 6 9000 40000000 #01<br>
+      rtgen lm all 1 7 6 9000 40000000 #02<br>
+      ...<br>
+      rtgen lm all 1 7 6 9000 40000000 #23<br>
+      rtgen lm all 1 7 6 9000 40000000 #24<br>
+      <br>
+      rtgen lm all 1 7 7 9000 40000000 #00<br>
+      rtgen lm all 1 7 7 9000 40000000 #01<br>
+      rtgen lm all 1 7 7 9000 40000000 #02<br>
+      ...<br>
+      rtgen lm all 1 7 7 9000 40000000 #23<br>
+      rtgen lm all 1 7 7 9000 40000000 #24</td>
+  </tr>
+  <tr>
+    <td vAlign="top" width="224">table precomputation time</td>
+    <td width="693">9000 * 1000000000 * 8&nbsp; / 354000 / 3600 / 24 = 2354 days<br>
+      11.8 days for each file, 200 files total</td>
+  </tr>
+</table>
+
+<h2>
+5. General notes for large charset configurations</h2>
+
+<ul>
+  <li>These configurations are ready for a typical 666MHz CPU. The performance
+    will be better with faster CPU.</li>
+  <li>Table precomputation of these configurations is time expensive. When
+    precomputation is partially finished, it is strongly recommended to test the
+    files before you continue to find out whether everything is well.<br>
+    In configuration #3, when the five files for the first rainbow table
+    (lm_alpha-numeric-symbol14#1-7_0_*.rt)
+is finished, you will have the chance of 68.6% to crack an &quot;alpha-numeric-symbol14&quot;
+password. Just sort these files and test the files with &quot;random_lm_alpha#1-7.hash&quot;.
+If everything goes well, you can crack about 7 of all 10 passwords.<br>
+    In configuration #4, the success rate of the first rainbow table(25 files,
+    lm_all#1-7_0_*.rt) is 0.5802. This may be an acceptable success rate with only
+    12.5% of full precomputation time.</li>
+  <li>Distributed table precomputation is recommended. In fact, all rainbow
+    tables are independent and you can distribute the tasks to many computers to
+    save time.</li>
+  <li>Earlier version of rcrack.exe will run several times slower than it should
+    be when key space is large. It is recommended that you use version 1.2 if
+    you want this configuration.
+  </li>
+  <li>A fast harddisk will greatly improve the performance of rcrack.exe because
+    it always takes a long time to load the files.
+  </li>
+</ul>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Notes for advanced users:</p>
+<ul>
+<li>The <a href="http://www.openssl.org/">openssl</a>'s des routine(des_set_key
+  and des_ecb_encrypt) takes most of the table precomputation time. If you have
+  a faster routine, replace it with yours. This may save the time of rtgen.exe
+  and rcrack.exe.</li>
+</ul>
+
+
+<h2><br>
+Appendix A: calc_success_probability.m</h2>
+
+<p>The <a href="http://www.mathworks.com/"> matlab</a> script below is used to
+calculate the success rate of a rainbow table.<br>
+File: calc_success_probability.m </p>
+
+
+
+
+<table border="0" width="100%" bgcolor="#EBEBEB">
+  <tr>
+    <td width="100%">
+    <pre>% 1 - (1 - 1 / N)^(m(1) + m(2) + m(3) + ... + m(t - 1))
+% m(1) = m, m(i) = N * (1 - (1 - 1 / N) ^ m(i - 1))
+
+function ret = calc_success_probability(N, t, m)
+arr = zeros(1, t - 1);
+arr(1) = m;
+for i = 2 : t - 1
+	arr(i) = N * (1 - (1 - 1 / N) ^ arr(i - 1));
+end;
+
+exp = 0;
+for i = 1 : t - 1
+	exp = exp + arr(i);
+end;
+
+ret = 1 - (1 - 1 / N) ^ exp;</pre>
+	</td>
+  </tr>
+</table>
+<p>Parameters:<br>
+N&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+key space<br>
+t&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+rainbow chain length<br>
+m&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+rainbow chain count<br>
+return&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; success rate of the rainbow table</p>
+<p>You need matlab to run the script, for example:</p>
+<table border="0" width="100%" bgcolor="#EBEBEB">
+  <tr>
+    <td width="100%">
+    <pre>&gt;&gt; calc_success_probability(80603140212, 2400, 40000000)
+
+ans =
+
+    0.6055</pre>
+    </td>
+  </tr>
+</table>
+<p><br>
+Create date: 2003/10/12<br>
+Revised: <!--webbot bot="Timestamp" startspan S-Type="EDITED"
+S-Format="%Y/%m/%d" -->2003/11/21<!--webbot bot="Timestamp" i-CheckSum="12366"
+endspan -->
+</p>
+</body>
+</html>

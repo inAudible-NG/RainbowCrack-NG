@@ -1,0 +1,439 @@
+
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta name="GENERATOR" content="Microsoft FrontPage 4.0">
+<meta name="ProgId" content="FrontPage.Editor.Document">
+<title>RainbowCrack v1.0 tutorial</title>
+</head>
+
+<body>
+
+<h1>RainbowCrack tutorial</h1>
+
+<p><font size="2">by Zhu Shuanglei &lt;shuanglei@hotmail.com><br>
+<a href="http://www.antsight.com/zsl/rainbowcrack/">http://www.antsight.com/zsl/rainbowcrack/</a></font></p>
+<hr size="1">
+
+<p>RainbowCrack is a general propose implementation of <a href="http://lasecwww.epfl.ch/philippe.shtml">Philippe
+Oechslin</a>'s <a href="http://lasecwww.epfl.ch/php_code/publications/search.php?ref=Oech03">faster
+time-memory trade-off technique</a>.
+In this tutorial, we will guide you through the steps to build a instant
+windows password cracker. You can always take Philippe Oechslin's paper as a
+good reference if you
+want some in depth understanding of the theory.<br>
+</p>
+
+<h2>1. Some basis of Time-Memory Trade-Off
+</h2>
+
+<p>There are two typical attacks in cryptanalysis of block ciphers: brute force
+and table precomputation. In brute force, an attacker tries all possible keys to
+encrypt a known plaintext for which he has the corresponding ciphertext. The
+idea of table precomputation is to precompute and store encryptions of a chosen
+plaintext and corresponding keys for all possible keys.&nbsp;</p>
+<p>RainbowCrack use the second method. It precompute and store all possible
+plaintext - hash pairs in&nbsp; files so called &quot;rainbow
+table&quot;. Any time the plaintext of a hash is required, you just look up the precomputed tables and find the
+plaintext in seconds.<br>
+</p>
+
+<h2>2. Select the configuration
+</h2>
+<p>First of all, we will select the configuration of the attack. There ars so
+many parameters to be adjusted in the theory: the success rate you want, the
+charset to use, the hard disk space you can afford and so on. If you know
+the theory well, you can work on you own. If not, we have prepared some typical parameter configurations for you. They are optimized to
+the best of my knowledge.
+</p>
+
+<p>NOTE: All the configurations below are ready for a 666MHz CPU. If your CPU
+is faster, the performance will be better.
+</p>
+
+<table border="1" width="100%" cellspacing="0">
+  <tr>
+    <td width="100%" colspan="2">configuration #0</td>
+  </tr>
+  <tr>
+    <td width="39%">hash algorithm</td>
+    <td width="61%">					lm</td>
+  </tr>
+  <tr>
+    <td width="39%">charset</td>
+    <td width="61%">					alpha (ABCDEFGHIJKLMNOPQRSTUVWXYZ)</td>
+  </tr>
+  <tr>
+    <td width="39%">plaintext length range</td>
+    <td width="61%"> 1 - 7</td>
+  </tr>
+  <tr>
+    <td width="39%">key space</td>
+    <td width="61%"> 26^1 + 26^2 + 26^3 + 26^4 + 26^5 + 26^6 + 26^7 = 8353082582</td>
+  </tr>
+  <tr>
+    <td width="39%">t</td>
+    <td width="61%">2100</td>
+  </tr>
+  <tr>
+    <td width="39%">m</td>
+    <td width="61%">8000000</td>
+  </tr>
+  <tr>
+    <td width="39%">l</td>
+    <td width="61%">5</td>
+  </tr>
+  <tr>
+    <td width="39%">disk usage</td>
+    <td width="61%">m * 16 * l = 640000000 B = 610 MB</td>
+  </tr>
+  <tr>
+    <td width="39%">success rate</td>
+    <td width="61%"> 0.9990</td>
+  </tr>
+  <tr>
+    <td width="39%">mean cryptanalysis time</td>
+    <td width="61%"> 3.7841 s</td>
+  </tr>
+  <tr>
+    <td width="39%">mean cryptanalysis time on a low memory system (free memory
+      size much smaller than 122MB)</td>
+    <td width="61%" valign="top"> 8.2836 s</td>
+  </tr>
+  <tr>
+    <td width="39%">max cryptanalysis time</td>
+    <td width="61%">   31.1441 s</td>
+  </tr>
+  <tr>
+    <td width="39%" valign="top">table precomputation commands</td>
+    <td width="61%">rtgen lm alpha 1 7 0 2100 8000000 all<br>
+      rtgen lm alpha 1 7 1 2100 8000000 all<br>
+      rtgen lm alpha 1 7 2 2100 8000000 all<br>
+      rtgen lm alpha 1 7 3 2100 8000000 all<br>
+      rtgen lm alpha 1 7 4 2100 8000000 all</td>
+  </tr>
+  <tr>
+    <td width="39%" valign="top">table precomputation time</td>
+    <td width="61%">2 days 18 hours</td>
+  </tr>
+</table>
+<p>Some explanations:
+</p>
+
+<table border="0" width="100%" cellspacing="0">
+  <tr>
+    <td width="22%">
+hash algorithm</td>
+    <td width="78%"> we will generate rainbow tables for lanmanager hash(lm),
+      other hash algorithms(md5, sha1 ...) are also possible</td>
+  </tr>
+  <tr>
+    <td width="22%">
+charset</td>
+    <td width="78%"> we use alpha characters as the plaintext charset</td>
+  </tr>
+  <tr>
+    <td width="22%">
+plaintext length range</td>
+    <td width="78%"> length range of the plaintext<br>
+      for example: if you use charset alpha and plaintext length range
+      &quot;4-6&quot;, &quot;AAAA&quot; and &quot;ZZZZZZ&quot; are among the key
+      space; &quot;AAA&quot; is not because it has a length 3</td>
+  </tr>
+  <tr>
+    <td width="22%">
+key space</td>
+    <td width="78%">There are 8353082582 different alpha only
+plaintexts.</td>
+  </tr>
+  <tr>
+    <td width="22%">t</td>
+    <td width="78%">rainbow chain length, see the <a href="http://lasecwww.epfl.ch/php_code/publications/search.php?ref=Oech03">paper</a>
+for detail</td>
+  </tr>
+  <tr>
+    <td width="22%">m</td>
+    <td width="78%">
+rainbow chain count of each rainbow table, see the <a href="http://lasecwww.epfl.ch/php_code/publications/search.php?ref=Oech03">paper</a>
+for detail</td>
+  </tr>
+  <tr>
+    <td width="22%">l</td>
+    <td width="78%">
+rainbow table count, see the <a href="http://lasecwww.epfl.ch/php_code/publications/search.php?ref=Oech03">paper</a>
+for detail</td>
+  </tr>
+  <tr>
+    <td width="22%" valign="top">
+disk usage</td>
+    <td width="78%"> disk space required to store all generated rainbow
+tables<br>
+      each rainbow chain will take 16 bytes (8 bytes for a start point and 8 bytes for
+a end point)</td>
+  </tr>
+  <tr>
+    <td width="22%" valign="top">
+success rate</td>
+    <td width="78%">When the rainbow tables have been generated, you will have
+the probability 99.9% to crack an&nbsp; alpha only password.<br>
+      Due to the nature of the theory, this is not a granted attack.</td>
+  </tr>
+  <tr>
+    <td width="22%" valign="top">mean cryptanalysis time</td>
+    <td width="78%">You need 3.7841 seconds to crack an alpha password on
+      average.<br>
+      It does not take into account the time spent on &quot;false alarm&quot;.<br>
+      See the <a href="http://lasecwww.epfl.ch/php_code/publications/search.php?ref=Oech03">paper</a>
+      to find out what is a &quot;false alarm&quot;.</td>
+  </tr>
+  <tr>
+    <td width="22%" valign="top">mean cryptanalysis time on a low memory system</td>
+    <td width="78%">If you don't have enough free physical memory to hold one
+      rainbow table a time, the program (rcrack.exe) will have to load the table
+      chunk by chunk and search the table chunk by chunk. Losing the change of
+      finding the password in early time.<br>
+      It does not take into account the time spent on &quot;false alarm&quot;.</td>
+  </tr>
+  <tr>
+    <td width="22%" valign="top">max cryptanalysis time</td>
+    <td width="78%">If the password you are searching is not covered by the
+      rainbow tables. You will have to search all tables only to find nothing.<br>
+      It does not take into account the time spent on &quot;false alarm&quot;.</td>
+  </tr>
+  <tr>
+    <td width="22%" valign="top">table precomputation commands</td>
+    <td width="78%">Use the utility &quot;rtgen.exe&quot; in the distribution
+      and these commands to generate the rainbow tables which are required to launch the
+      attack.<br>
+      (see next section of the tutorial for more)</td>
+  </tr>
+  <tr>
+    <td width="22%" valign="top">table precomputation time</td>
+    <td width="78%">Table precomputation is time expensive. This is the meaning
+      of &quot;Time-Memory Trade-Off&quot;.</td>
+  </tr>
+</table>
+&nbsp;
+
+<table border="1" width="100%" cellspacing="0">
+  <tr>
+    <td width="100%" colspan="2">configuration #1</td>
+  </tr>
+  <tr>
+    <td width="39%">hash algorithm</td>
+    <td width="61%">					lm</td>
+  </tr>
+  <tr>
+    <td width="39%">charset</td>
+    <td width="61%">					alpha-numeric(ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789)</td>
+  </tr>
+  <tr>
+    <td width="39%">plaintext length range</td>
+    <td width="61%"> 1 - 7</td>
+  </tr>
+  <tr>
+    <td width="39%">key space</td>
+    <td width="61%"> 36^1 + 36^2 + 36^3 + 36^4 + 36^5 + 36^6 + 36^7 = 80603140212</td>
+  </tr>
+  <tr>
+    <td width="39%">t</td>
+    <td width="61%">2400</td>
+  </tr>
+  <tr>
+    <td width="39%">m</td>
+    <td width="61%">40000000</td>
+  </tr>
+  <tr>
+    <td width="39%">l</td>
+    <td width="61%">5</td>
+  </tr>
+  <tr>
+    <td width="39%">disk usage</td>
+    <td width="61%">m * 16 * l = 3200000000 B = 3 GB</td>
+  </tr>
+  <tr>
+    <td width="39%">success rate</td>
+    <td width="61%"> 0.9904</td>
+  </tr>
+  <tr>
+    <td width="39%">mean cryptanalysis time</td>
+    <td width="61%"> 7.6276 s</td>
+  </tr>
+  <tr>
+    <td width="39%">mean cryptanalysis time on a low memory system (free memory
+      size much smaller than 610MB)</td>
+    <td width="61%"> 13.3075 s</td>
+  </tr>
+  <tr>
+    <td width="39%">max cryptanalysis time</td>
+    <td width="61%">   40.6780 s</td>
+  </tr>
+  <tr>
+    <td width="39%" valign="top">table precomputation commands</td>
+    <td width="61%">rtgen lm alpha-numeric 1 7 0 2400 40000000 all<br>
+      rtgen lm alpha-numeric 1 7 1 2400 40000000 all<br>
+      rtgen lm alpha-numeric 1 7 2 2400 40000000 all<br>
+      rtgen lm alpha-numeric 1 7 3 2400 40000000 all<br>
+      rtgen lm alpha-numeric 1 7 4 2400 40000000 all</td>
+  </tr>
+  <tr>
+    <td width="39%" valign="top">table precomputation time</td>
+    <td width="61%">15 days 17 hours</td>
+  </tr>
+</table>
+<p>Some explanations:<br>
+With this configuration, you can crack an alpha-numeric password in 13.3075 seconds
+on a 256MB memory system with 99.04% success rate.&nbsp;
+</p>
+
+<p>In this tutorial we use &quot;configuration#0&quot;. If you want the
+second configuration, everything is similar.
+</p>
+
+<h2>
+<br>
+3. Precompute the rainbow tables with rtgen.exe
+</h2>
+
+<p>Now the time to generate the rainbow tables.<br>
+ There is an utility
+called &quot;rtgen.exe&quot; (rainbow table generator) in the distribution. Now
+open
+a command prompt, switch to the directory where the rainbowcrack files are
+extracted, make sure there is 128 MB free disk space in place and execute the command:
+</p>
+
+<table border="0" width="100%" cellspacing="0" bgcolor="#EBEBEB">
+  <tr>
+    <td width="100%">rtgen lm alpha 1 7 0 2100 8000000 all</td>
+  </tr>
+</table>
+<p>This will begin the generation of first rainbow table. It takes 13.2 hours to
+complete on a 666 MHz CPU.<br>
+If you want to generate a rainbow table for md5/sha1 algorithm(used to crack
+md5/sha1 hashes), you can use the command like this &quot;rtgen md5 alpha 1 7 0 2100 8000000 all&quot;
+or &quot;rtgen sha1 alpha 1 7 0 2100 8000000 all&quot;. Here &quot;alpha&quot;
+is upper case alpha, you can generate a lower case alpha table like this &quot;rtgen
+md5 loweralpha 1 7 0 2100 8000000 all&quot;.<br>
+<br>
+Leave you computer working ...<br>
+<br>
+You can pause the precomputation any time by pressing Ctrl+C.
+Next time you run rtgen.exe with the same parameters the program will pick up
+where the precomputation left off and continue the generation of the rainbow
+table.&nbsp;
+</p>
+
+<p>When the generation of first rainbow table is finished. There will be a file
+named &quot;lm_alpha#1-7_0_2100x8000000_all.rt&quot; (128000000 bytes) in the
+directory. Don't rename the file because we store some parameters in the file
+title.&nbsp;
+</p>
+
+<p>Now the time to generate the remaining rainbow tables, make sure you have
+enough free disk space (128000000 bytes for each table):
+</p>
+
+<table border="0" width="100%" cellspacing="0" bgcolor="#EBEBEB">
+  <tr>
+    <td width="100%">
+      rtgen lm alpha 1 7 1 2100 8000000 all<br>
+      rtgen lm alpha 1 7 2 2100 8000000 all<br>
+      rtgen lm alpha 1 7 3 2100 8000000 all<br>
+      rtgen lm alpha 1 7 4 2100 8000000 all</td>
+  </tr>
+</table>
+<p>Replace &quot;lm&quot; with &quot;md5&quot; or &quot;sha1&quot; if you want.
+</p>
+
+<p>Leave you computer working ...<br>
+......<br>
+......<br>
+<br>
+<br>
+When the precomputation is complete, make sure the following files are in place:<br>
+128,000,000 bytes&nbsp;&nbsp;&nbsp; lm_alpha#1-7_0_2100x8000000_all.rt<br>
+128,000,000 bytes&nbsp;&nbsp;&nbsp; lm_alpha#1-7_1_2100x8000000_all.rt<br>
+128,000,000 bytes&nbsp;&nbsp;&nbsp; lm_alpha#1-7_2_2100x8000000_all.rt<br>
+128,000,000 bytes&nbsp;&nbsp;&nbsp; lm_alpha#1-7_3_2100x8000000_all.rt<br>
+128,000,000 bytes&nbsp;&nbsp;&nbsp; lm_alpha#1-7_4_2100x8000000_all.rt
+</p>
+
+<p>If everything goes well, backup all files (recommended) and proceed to the
+next section of the tutorial.
+</p>
+
+<h2>4. Sort rainbow tables with rtsort.exe
+</h2>
+
+<p>To speed up the search of rainbow table, we should sort the rainbow table
+with &quot;rtsort.exe&quot; in advance.<br>
+In fact &quot;rcrack.exe&quot; only accept sorted rainbow tables.<br>
+<br>
+Use these commands:
+</p>
+
+<table border="0" width="100%" cellspacing="0" bgcolor="#EBEBEB">
+  <tr>
+    <td width="100%">rtsort lm_alpha#1-7_0_2100x8000000_all.rt<br>
+      rtsort lm_alpha#1-7_1_2100x8000000_all.rt<br>
+      rtsort lm_alpha#1-7_2_2100x8000000_all.rt<br>
+      rtsort lm_alpha#1-7_3_2100x8000000_all.rt<br>
+      rtsort lm_alpha#1-7_4_2100x8000000_all.rt</td>
+  </tr>
+</table>
+<p>Each command will take several minutes to complete. The
+&quot;rtsort.exe&quot; utility will sort the file and write back to the original
+file.<br>
+<br>
+Notice: If free memory size is smaller than the file size, we can't load the
+file into memory at a time. In which case extra free disk space as large as the
+file to be sorted is required to apply an external sort.
+</p>
+
+<p>If everything goes well, proceed to the next section.
+</p>
+
+<h2>5. Crack the hash with rcrack.exe and the sorted rainbow
+tables
+</h2>
+
+<p>Finally you have everything ready. Now the time to play with
+&quot;rcrack.exe&quot;.<br>
+Notice the file &quot;random_lm_alpha#1-7.hash&quot; in the distribution. It
+contain 10 randomly generated lanmanager hashes(charset alpha, length 1-7). We
+will use this file as a test vector.<br>
+<br>
+Launch the program by issuing the command:</p>
+<table border="0" width="100%" cellspacing="0" bgcolor="#EBEBEB">
+  <tr>
+    <td width="100%">rcrack c:\rainbowcrack\*.rt -l random_lm_alpha#1-7.hash</td>
+  </tr>
+</table>
+
+<p>You should replace &quot;c:\rainbowcrack\&quot; with where you place the
+sorted rainbow tables. It seems that you will find the plaintext of all 10
+lanmanager hashes. Now open the file &quot;random_lm_alpha#1-7.plain&quot; and
+validate the result of rcrack.exe. If they match, that is ok.</p>
+
+<p>To crack some windows password, the syntax is similar:</p>
+<table border="0" width="100%" cellspacing="0" bgcolor="#EBEBEB">
+  <tr>
+    <td width="100%">pwdump2 > pwfile.txt<br>
+      rcrack c:\rainbowcrack\*.rt -f pwfile.txt</td>
+  </tr>
+</table>
+
+<p>The pwdump2 utility is used to dump the lanmanager hashes of windows system.
+If your password consists of letters only, rcrack will be able to crack it with
+the success rate 99.9%.<br>
+<br>
+Have fun!<br>
+<br>
+Create date: 2003/9/9<br>
+Revised: 2003/11/21</p>
+
+</body>
+
+</html>

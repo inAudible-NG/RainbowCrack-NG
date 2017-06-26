@@ -1,0 +1,11 @@
+# charset configuration file for rainbowcrack 1.1 and later
+# by Zhu Shuanglei <shuanglei@hotmail.com>
+
+alpha                  = [ABCDEFGHIJKLMNOPQRSTUVWXYZ]
+alpha-numeric          = [ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789]
+alpha-numeric-symbol14 = [ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_+=]
+all                    = [ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_+=~`[]{}|\:;"'<>,.?/]
+
+numeric                = [0123456789]
+loweralpha             = [abcdefghijklmnopqrstuvwxyz]
+loweralpha-numeric     = [abcdefghijklmnopqrstuvwxyz0123456789]
