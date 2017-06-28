@@ -35,7 +35,7 @@ void QuickSort(RainbowChain* pChain, int nRainbowChainCount)
 
 int QuickSortPartition(RainbowChain* pChain, int nLow, int nHigh)
 {
-	int nRandomIndex = nLow + ((unsigned int)rand() * (RAND_MAX + 1L) + (unsigned int)rand()) % (nHigh - nLow + 1);
+	int nRandomIndex = nLow + ((unsigned int)rand() * (RAND_MAX + 1LL) + (unsigned int)rand()) % (nHigh - nLow + 1);
 	RainbowChain TempChain;
 	TempChain = pChain[nLow];
 	pChain[nLow] = pChain[nRandomIndex];
