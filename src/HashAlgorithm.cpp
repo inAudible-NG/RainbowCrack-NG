@@ -21,9 +21,9 @@
 	#pragma comment(lib, "libeay32.lib")
 #endif
 
-void setup_des_key(unsigned char key_56[], des_key_schedule &ks)
+void setup_des_key(unsigned char key_56[], DES_key_schedule &ks)
 {
-	des_cblock key;
+	DES_cblock key;
 
 	key[0] = key_56[0];
 	key[1] = (key_56[0] << 7) | (key_56[1] >> 1);
@@ -35,7 +35,7 @@ void setup_des_key(unsigned char key_56[], des_key_schedule &ks)
 	key[7] = (key_56[6] << 1);
 
 	//des_set_odd_parity(&key);
-	des_set_key(&key, ks);
+	DES_set_key(&key, &ks);
 }
 
 void HashLM(unsigned char* pPlain, int nPlainLen, unsigned char* pHash)
@@ -50,10 +50,10 @@ void HashLM(unsigned char* pPlain, int nPlainLen, unsigned char* pHash)
 		pPlain[i] = 0;
 
 	static unsigned char magic[] = {0x4B, 0x47, 0x53, 0x21, 0x40, 0x23, 0x24, 0x25};
-	des_key_schedule ks;
+	DES_key_schedule ks;
 	//setup_des_key(data, ks);
 	setup_des_key(pPlain, ks);
-	des_ecb_encrypt((des_cblock*)magic, (des_cblock*)pHash, ks, DES_ENCRYPT);
+	DES_ecb_encrypt((DES_cblock*)magic, (DES_cblock*)pHash, &ks, DES_ENCRYPT);
 }
 
 void HashNTLM(unsigned char* pPlain, int nPlainLen, unsigned char* pHash)
