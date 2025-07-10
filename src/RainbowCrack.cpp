@@ -12,6 +12,7 @@
 
 #ifdef _WIN32
 	#include <io.h>
+	#include <sys/stat.h>  // _A_SUBDIR
 #else
 	#include <sys/types.h>
 	#include <sys/stat.h>
@@ -21,41 +22,46 @@
 #include <cstring>
 #include <openssl/md4.h>
 #ifdef _WIN32
-	#pragma comment(lib, "libeay32.lib")
+	#pragma comment(lib, "libcrypto.lib")
 #endif
 
 //////////////////////////////////////////////////////////////////////
-
 #ifdef _WIN32
-void GetTableList(string sWildCharPathName, vector<string>& vPathName)
+void GetTableList(const std::string& sWildCharPathName, std::vector<std::string>& vPathName)
 {
-	vPathName.clear();
+    vPathName.clear();
 
-	string sPath;
-	int n = sWildCharPathName.find_last_of('\\');
-	if (n != -1)
-		sPath = sWildCharPathName.substr(0, n + 1);
+    // Извлечение пути к папке (до последнего '\')
+    std::string sPath;
+    size_t n = sWildCharPathName.find_last_of("\\/");
+    if (n != std::string::npos)
+        sPath = sWildCharPathName.substr(0, n + 1);
+    else
+        sPath = "";  // fallback, если пути нет
 
-	_finddata_t fd;
-	long handle = _findfirst(sWildCharPathName.c_str(), &fd);
-	if (handle != -1)
-	{
-		do
-		{
-			string sName = fd.name;
-			if (sName != "." && sName != ".." && !(fd.attrib & _A_SUBDIR))
-			{
-				string sPathName = sPath + sName;
-				vPathName.push_back(sPathName);
-			}
-		} while (_findnext(handle, &fd) == 0);
+    _finddata_t fd;
+    intptr_t handle = _findfirst(sWildCharPathName.c_str(), &fd);
 
-		_findclose(handle);
-	}
+    if (handle == -1L) {
+        printf("[GetTableList] No files found for pattern: %s\n", sWildCharPathName.c_str());
+        return;
+    }
+
+    do {
+        // Пропускаем папки и служебные имена
+        if (!(fd.attrib & _A_SUBDIR) && strcmp(fd.name, ".") != 0 && strcmp(fd.name, "..") != 0)
+        {
+            std::string sPathName = sPath + fd.name;
+            vPathName.push_back(sPathName);
+        }
+    } while (_findnext(handle, &fd) == 0);
+
+    _findclose(handle);
 }
 #else
 void GetTableList(int argc, char* argv[], vector<string>& vPathName)
 {
+	printf("GetTableList NOT WIN32 Begin\n");
 	vPathName.clear();
 
 	int i;
@@ -209,23 +215,36 @@ void Usage()
 
 int main(int argc, char* argv[])
 {
+	/// printf("Begin\n");
 #ifdef _WIN32
+	/// printf("IFDEF WIN32 ST\n");
 	if (argc != 4)
 	{
 		Usage();
+		/// printf("Error U");
 		return 0;
 	}
 	string sWildCharPathName = argv[1];
 	string sInputType        = argv[2];
 	string sInput            = argv[3];
+	/// printf("IFDEF WIN32 SET STRINGS\n");
 
 	// vPathName
 	vector<string> vPathName;
+	/// printf("IFDEF WIN32 SET vPathName\n");
+	/// printf("GetTableList path raw: [%s]\n", sWildCharPathName.c_str());
+	/// for (size_t i = 0; i < sWildCharPathName.length(); ++i)
+	///     printf("%02X ", (unsigned char)sWildCharPathName[i]);
+	/// printf("\n");
 	GetTableList(sWildCharPathName, vPathName);
+	//GetTableList(sWildCharPathName, vPathName);
+	/// printf("IFDEF WIN32 COMP\n");
 #else
+	/// printf("IFDEF NOT WIN32 ST\n");
 	if (argc < 4)
 	{
 		Usage();
+		/// printf("Error U\n");
 		return 0;
 	}
 	string sInputType        = argv[argc - 2];
@@ -234,7 +253,9 @@ int main(int argc, char* argv[])
 	// vPathName
 	vector<string> vPathName;
 	GetTableList(argc, argv, vPathName);
+	/// printf("IFDEF NOT WIN32 COMP\n");
 #endif
+	/// printf("IFDEF WIN32 AFT\n");
 	if (vPathName.size() == 0)
 	{
 		printf("no rainbow table found\n");
@@ -288,13 +309,18 @@ int main(int argc, char* argv[])
 	else
 	{
 		Usage();
+		printf("Error U");
 		return 0;
 	}
 
-	if (fCrackerType && vHash.size() == 0)
+	if (fCrackerType && vHash.size() == 0){
+		printf("Error 1");
 		return 0;
-	if (!fCrackerType && vLMHash.size() == 0)
+	}
+	if (!fCrackerType && vLMHash.size() == 0){
+		printf("Error 2");
 		return 0;
+	}
 
 	// hs
 	CHashSet hs;
@@ -315,6 +341,7 @@ int main(int argc, char* argv[])
 	}
 
 	// Run
+	/// printf("Running CE\n");
 	CCrackEngine ce;
 	ce.Run(vPathName, hs);
 
@@ -398,5 +425,6 @@ int main(int argc, char* argv[])
 		}
 	}
 
+	/// printf("Exit");
 	return 0;
 }

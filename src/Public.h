@@ -15,7 +15,9 @@
 #include <cstdlib>
 #include <stdint.h>
 #include <csignal>
-#include <unistd.h>
+#ifndef _WIN32
+	#include <unistd.h>
+#endif
 
 #include <string>
 #include <vector>

@@ -14,7 +14,7 @@
 #include <ctype.h>
 #include <openssl/rand.h>
 #ifdef _WIN32
-	#pragma comment(lib, "libeay32.lib")
+	#pragma comment(lib, "libcrypto.lib")
 #endif
 
 //////////////////////////////////////////////////////////////////////
@@ -405,24 +405,21 @@ void CChainWalkContext::IndexToPlain()
 		unsigned int nPlainCharsetLen = m_nPlainCharsetLen;
 		unsigned int nTemp;
 #ifdef _WIN32
-		__asm
-		{
-			mov eax, nIndexOfX32
-			xor edx, edx
-			div nPlainCharsetLen
-			mov nIndexOfX32, eax
-			mov nTemp, edx
-		}
+	// Заменяем ассемблер на стандартный C++
+	nTemp = nIndexOfX32 % nPlainCharsetLen;
+	nIndexOfX32 = nIndexOfX32 / nPlainCharsetLen;
 #else
-		__asm__ __volatile__ (	"mov %2, %%eax;"
-								"xor %%edx, %%edx;"
-								"divl %3;"
-								"mov %%eax, %0;"
-								"mov %%edx, %1;"
-								: "=m"(nIndexOfX32), "=m"(nTemp)
-								: "m"(nIndexOfX32), "m"(nPlainCharsetLen)
-								: "%eax", "%edx"
-							 );
+	// Оригинальный GCC inline asm
+	__asm__ __volatile__ (
+		"mov %2, %%eax;"
+		"xor %%edx, %%edx;"
+		"divl %3;"
+		"mov %%eax, %0;"
+		"mov %%edx, %1;"
+		: "=m"(nIndexOfX32), "=m"(nTemp)
+		: "m"(nIndexOfX32), "m"(nPlainCharsetLen)
+		: "%eax", "%edx"
+	);
 #endif
 		m_Plain[i] = m_PlainCharset[nTemp];
 	}

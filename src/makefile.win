@@ -1,6 +1,8 @@
+OPENSSL_INC = "C:\Program Files\OpenSSL-Win64\include"
+OPENSSL_LIB = "C:\Program Files\OpenSSL-Win64\lib\VC\x64\MDd"
 
-CFLAGS = /nologo /MT /W3 /GX /O2
-LDFLAGS = kernel32.lib gdi32.lib libeay32.lib /nologo /subsystem:console /machine:I386
+CFLAGS = /nologo /MT /W3 /GX /O2 /I$(OPENSSL_INC)
+LDFLAGS = /LIBPATH:$(OPENSSL_LIB) kernel32.lib gdi32.lib libcrypto.lib /nologo /subsystem:console /machine:X64
 
 all: rtgen rtdump rtsort rcrack
 

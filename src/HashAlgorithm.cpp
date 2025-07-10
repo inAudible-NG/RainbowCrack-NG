@@ -18,7 +18,7 @@
 #include <openssl/sha.h>
 #include <openssl/ripemd.h>
 #ifdef _WIN32
-	#pragma comment(lib, "libeay32.lib")
+	#pragma comment(lib, "libcrypto.lib")
 #endif
 
 void setup_des_key(unsigned char key_56[], DES_key_schedule &ks)
